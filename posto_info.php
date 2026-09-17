@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informações do Posto</title>
-        <link rel="icon" href="images/iconlogo.png">
+    <title>Informações do Evento</title>
+    <link rel="icon" href="images/logo-agenda-teste.png">
     <link rel="stylesheet" href="style.css">
-    <script src="pernoite.js"></script>
+    <script src="agenda.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 .checked {
-  color: #f97316;
+  color: #ee603c;
 }
 </style>
 
@@ -25,7 +25,7 @@
       <div class="col-md-4">
 <?php include "menu.php"; ?>
         <div class="col-md-4">
-            <h2>Informações do Posto</h2>
+            <h2>Informações do Evento</h2>
         </div>
         <div class="col-md-4"></div>
 

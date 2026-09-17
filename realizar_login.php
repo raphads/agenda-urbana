@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit">
     <title>Pernoite Amiga</title>
-    <link rel="icon" href="images/iconlogo.png">
+    <link rel="icon" href="images/logo-agenda-teste.png">
     <link rel="stylesheet" href="style.css">
-    <script src="pernoite.js"></script>
+    <script src="agenda.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 
         </head>

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit">
-    <title>Pernoite Amiga</title>
+    <title>Agenda Urbana</title>
     <link rel="icon" href="images/iconlogo.png">
     <link rel="stylesheet" href="style.css">
-    <script src="pernoite.js"></script>
+    <script src="agenda.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -31,14 +31,14 @@
             <input type="password" placeholder="***" required id="senha1"><br><br>
             <label>Confirmar Senha</label><br>
             <input type="password" placeholder="***" required id="senha2" onchange="Confirmar()" name="senha"><br><br>
-             <button type="submit" id="botao" onClick="document.form.action='cadastrar_conta.php'">Cadastrar</button>
+             <button type="submit" id="botao" onClick="document.form.action='cadastrar_conta.php'" style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c">Cadastrar</button>
         </form>
-        <a href="index.php" style="color: #F97316;">Voltar</a>
+        <a href="index.php" style="color: #ed683f;">Voltar</a>
         </div>
 
     <div class="col-md-9">
 
-        <img src="images/logohome.jpeg" width="100%" height="100%">
+        <img src="images/logoagenda.jfif" width="100%" height="100%">
 
     </div>
 

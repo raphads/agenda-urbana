@@ -9,17 +9,18 @@ $resultado = $conecta_db->query($sql);
 <head>
   <meta charset="UTF-8">
   <title>Lista de Postos</title>
+   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-4">
-  <h2>Postos cadastrados</h2>
+  <h2>Eventos cadastrados</h2>
   <table class="table table-bordered">
     <thead>
       <tr>
         <th>ID</th>
         <th>Nome</th>
-        <th>Endereço</th>
+        <th>CEP</th>
         <th>Número</th>
         <th>Latitude</th>
         <th>Longitude</th>

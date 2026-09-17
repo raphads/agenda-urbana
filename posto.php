@@ -85,10 +85,10 @@ $comentarios = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informações do Posto</title>
-        <link rel="icon" href="images/iconlogo.png">
+    <title>Agenda Urbana</title>
+    <link rel="icon" href="images/logo-agenda-teste.png">
     <link rel="stylesheet" href="style.css">
-    <script src="pernoite.js"></script>
+    <script src="agenda.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -104,26 +104,22 @@ $comentarios = $stmt->get_result();
 <body>
  <div class="container-fluid">
 <div class="row">
-      <div class="col-md-4">
-        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-        <nav class="sidebar" id="sidebar">
-        <ul>
-            <li><button><a href="maps.php">Mapa <img class="icone" src="images/map (1)l.png"></a></button></li>
-            <li><button><a href="add_posto.php">Adicionar Posto&nbsp;<img class="icone" src="images/gas-stationl.png"></a></button></li>
-            
-            
-        </ul><button><a href="logout.php">Sair&nbsp;<img class="icone" src="images/logoutl.png"></a></button>
-    </nav>
-
+      <div class="col-md-2">
+   
       </div>
 
-<div class="col-md-4">
+<div class="col-md-8">
 <h1><?php echo $posto['nome_posto']; ?></h1>
  
 <p><strong>CEP:</strong> <?php echo $posto['endereco']; ?></p>
+<p><strong>Preço:</strong> <?php echo $posto['endereco']; ?></p>
 <p><strong>Horário:</strong> 
     <?php echo date("H:i", strtotime($posto['hora_abre'])); ?> - 
     <?php echo date("H:i", strtotime($posto['hora_fecha'])); ?>
+</p>
+<p><strong>Data:</strong> De 
+    <?php echo date("H:i", strtotime($posto['hora_abre'])); ?> até 
+    <?php echo date("H:i", strtotime($posto['hora_abre'])); ?>
 </p>
 <p><strong>Observações:</strong> <?php echo $posto['obs']; ?></p>
 
@@ -149,8 +145,17 @@ $comentarios = $stmt->get_result();
   </button>
 </div>
 </div>
-<div class="col-md-4">
+<div class="col-md-2">
 
+    </div>
+
+<div class="row">
+    <div class="col-md-2">
+
+    </div>
+    <div class="col-md-8">
+
+    
 <!-- Formulário de Comentários -->
 <h2>Deixe seu comentário</h2>
 <form method="post" action="">
@@ -169,7 +174,11 @@ $comentarios = $stmt->get_result();
                 em <?php echo date("d/m/Y H:i", strtotime($c['data_comentario'])); ?>
             </small>
         </div>
+       
+        <div class="col-md-2">
+
     </div>
+</div>
 <?php } ?>
 
 </div>

@@ -12,9 +12,9 @@ if (!isset($_SESSION['usuario'])) {
 <head>
     <meta charset="UTF-8">
         <title>Mapa</title>
-        <link rel="icon" href="images/iconlogo.png">
+        <link rel="icon" href="images/logo-agenda-teste.png">
         <link rel="stylesheet" href="style.css">
-    <script src="pernoite.js"></script>
+    <script src="agenda.js"></script>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
 
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,6 +23,16 @@ if (!isset($_SESSION['usuario'])) {
         #map { height: 500px; width: 80%; margin: auto; border: 2px solid #ccc; border-radius: 10px; }
     </style>
     </head>
+    <header>
+          
+            <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="maps.php" style="color: #fff; text-decoration: none;">Mapa <img class="icone" src="images/map (1)l.png"></a></button>
+            <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="add_posto.php" style="color: #fff; text-decoration: none;">Adicionar Evento&nbsp;<img class="icone" src="images/evento.png"></a></button>
+            
+            
+      
+        <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="index.php" style="color: #fff; text-decoration: none;">Sair&nbsp;<img class="icone" src="images/logoutl.png"></a></button>
+  
+</header>
     <body>
         
 <?php
@@ -52,12 +62,7 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
         
     <div class="col-md-4"></div>
     
-               <h3>Mapa dos Postos</h3><nav><button><a  style="color: white;
-    text-decoration: none;
-    display: block;
-    font-size: 1.2rem;
-    padding: 10px;
-    transition: background-color 0.3s ease;" href="add_posto.php">Adicionar Posto&nbsp;<img class="icone" src="images/gas-stationl.png"></a></button></nav>
+               <h3>Mapa dos Eventos</h3>
                 <div id="map"></div>
 
             </div>
