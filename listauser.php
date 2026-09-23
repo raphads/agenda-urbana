@@ -9,6 +9,7 @@ $resultado = $conecta_db->query($sql);
 <head>
   <meta charset="UTF-8">
   <title>Lista de Usuários</title>
+   <link rel="icon" href="images/logo-agenda-teste.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>

@@ -24,32 +24,25 @@ if (!isset($_SESSION['usuario'])) {
     </style>
     </head>
     <header>
-          
-            <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="maps.php" style="color: #fff; text-decoration: none;">Mapa <img class="icone" src="images/map (1)l.png"></a></button>
-            <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="add_posto.php" style="color: #fff; text-decoration: none;">Adicionar Evento&nbsp;<img class="icone" src="images/evento.png"></a></button>
-            
-            
-      
-        <button style="backgorund-color: #17395e; border-radius: 40px; border-color: #ee603c"><a href="index.php" style="color: #fff; text-decoration: none;">Sair&nbsp;<img class="icone" src="images/logoutl.png"></a></button>
-  
+<?php include 'header.php' ?>
 </header>
     <body>
         
 <?php
     include "conexao.php"; // conexão com o banco
 
-    $sql = "SELECT p.id_posto, p.nome_posto, p.latitude, p.longitude, 
+    $sql = "SELECT p.id_evento, p.nome_evento, p.latitude, p.longitude, 
                GROUP_CONCAT(f.caminho) AS fotos
-        FROM tb_posto p
-        LEFT JOIN fotos_postos f ON p.id_posto = f.id_posto
-        GROUP BY p.id_posto";
+        FROM tb_evento p
+        LEFT JOIN fotos_eventos f ON p.id_evento = f.id_evento
+        GROUP BY p.id_evento";
 $resultado = mysqli_query($conecta_db, $sql);
 
-$postos = [];
+$eventos = [];
 while ($linha = mysqli_fetch_assoc($resultado)) {
-    $postos[] = [
-        "id" => $linha['id_posto'],
-        "nome" => $linha['nome_posto'],
+    $eventos[] = [
+        "id" => $linha['id_evento'],
+        "nome" => $linha['nome_evento'],
         "lat" => (float)$linha['latitude'],
         "lng" => (float)$linha['longitude'],
         "fotos" => explode(",", $linha['fotos'])
@@ -95,17 +88,17 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
     }).addTo(map);
 
     // Dados vindos do PHP
-    var postosMapa = <?php echo json_encode($postos, JSON_UNESCAPED_UNICODE); ?>;
+    var eventosMapa = <?php echo json_encode($eventos, JSON_UNESCAPED_UNICODE); ?>;
 
     // Loop para adicionar marcadores
-    postosMapa.forEach(function(p) {
+    eventosMapa.forEach(function(p) {
         L.marker([p.lat, p.lng])
          .addTo(map)
          .bindPopup(p.nome);
     });
 
-    postosMapa.forEach(function(p) {
-    var popupContent = "<a href='posto.php?id=" + p.id + "'><b>" + p.nome + "</b></a><br>";
+    eventosMapa.forEach(function(p) {
+    var popupContent = "<a href='evento.php?id=" + p.id + "'><b>" + p.nome + "</b></a><br>";
     if (p.fotos) {
         p.fotos.forEach(function(foto) {
             popupContent += "<img src='" + foto + "' width='100' style='margin:5px'>";
@@ -139,7 +132,7 @@ var markersLayer = L.layerGroup().addTo(map);
 
 function atualizarMapa(centroLat, centroLng, raio) {
     markersLayer.clearLayers();
-    postosMapa.forEach(function(p) {
+    eventosMapa.forEach(function(p) {
         var distancia = calcularDistancia(centroLat, centroLng, p.lat, p.lng);
         if (distancia <= raio) {
             var popupContent = "<b>" + p.nome + "</b><br>";

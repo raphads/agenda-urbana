@@ -12,23 +12,23 @@ include "conexao.php";
 
 date_default_timezone_set('America/Sao_Paulo');
 
-$posto_id = $_GET['id'];
+$evento_id = $_GET['id'];
 
-// Dados do posto
-$stmt = $conecta_db->prepare("SELECT * FROM tb_posto WHERE id_posto = ?");
+// Dados do evento
+$stmt = $conecta_db->prepare("SELECT * FROM tb_evento WHERE id_evento = ?");
 if (!$stmt) {
     die("Erro no prepare1: " . $conecta_db->error);
 }
-$stmt->bind_param("i", $posto_id);
+$stmt->bind_param("i", $evento_id);
 $stmt->execute();
-$posto = $stmt->get_result()->fetch_assoc();
+$evento = $stmt->get_result()->fetch_assoc();
 
 // Fotos
-$stmt = $conecta_db->prepare("SELECT caminho FROM fotos_postos WHERE id_posto = ?");
+$stmt = $conecta_db->prepare("SELECT caminho FROM fotos_eventos WHERE id_evento = ?");
 if (!$stmt) {
     die("Erro no prepare2: " . $conecta_db->error);
 }
-$stmt->bind_param("i", $posto_id);
+$stmt->bind_param("i", $evento_id);
 $stmt->execute();
 $fotos = $stmt->get_result();
 /*
@@ -36,11 +36,11 @@ $fotos = $stmt->get_result();
 $stmt = $conecta_db->prepare("SELECT a.nota, a.comentario, u.nome, a.data 
                               FROM avaliacoes a 
                               JOIN usuarios u ON a.usuario_id = u.id_usuario 
-                              WHERE a.id_posto = ?");
+                              WHERE a.id_evento = ?");
 if (!$stmt) {
     die("Erro no prepare3: " . $conecta_db->error);
 }
-$stmt->bind_param("i", $posto_id);
+$stmt->bind_param("i", $evento_id);
 $stmt->execute();
 $avaliacoes = $stmt->get_result();
 
@@ -48,11 +48,11 @@ $avaliacoes = $stmt->get_result();
 $stmt = $conecta_db->prepare("SELECT c.texto, c.data, u.nome 
                               FROM comentarios c 
                               JOIN usuarios u ON c.usuario_id = u.id_usuario 
-                              WHERE c.id_posto = ?");
+                              WHERE c.id_evento = ?");
 if (!$stmt) {
     die("Erro no prepare4: " . $conecta_db->error);
 }
-$stmt->bind_param("i", $posto_id);
+$stmt->bind_param("i", $evento_id);
 $stmt->execute();
 $comentarios = $stmt->get_result();
 */
@@ -62,8 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['texto'])) {
     $texto = $_POST['texto'];
 
 $id_user = $_SESSION['usuario_id']; // esse valor deve ser o id_user do cadastro
-$stmt = $conecta_db->prepare("INSERT INTO tb_comentarios (id_user, id_posto, texto) VALUES (?, ?, ?)");
-$stmt->bind_param("iis", $id_user, $posto_id, $texto);
+$stmt = $conecta_db->prepare("INSERT INTO tb_comentarios (id_user, id_evento, texto) VALUES (?, ?, ?)");
+$stmt->bind_param("iis", $id_user, $evento_id, $texto);
 $stmt->execute();
 
 }
@@ -72,9 +72,9 @@ $stmt->execute();
 $stmt = $conecta_db->prepare("SELECT c.texto, c.data_comentario, u.name_user, u.email_user
                               FROM tb_comentarios c
                               JOIN tb_cadastro u ON c.id_user = u.id_user
-                              WHERE c.id_posto = ?
+                              WHERE c.id_evento = ?
                               ORDER BY c.data_comentario DESC");
-$stmt->bind_param("i", $posto_id);
+$stmt->bind_param("i", $evento_id);
 $stmt->execute();
 $comentarios = $stmt->get_result();
 
@@ -101,6 +101,9 @@ $comentarios = $stmt->get_result();
 </style>
 
 </head>
+<header>
+    <?php include 'header.php' ?>
+</header>
 <body>
  <div class="container-fluid">
 <div class="row">
@@ -109,23 +112,23 @@ $comentarios = $stmt->get_result();
       </div>
 
 <div class="col-md-8">
-<h1><?php echo $posto['nome_posto']; ?></h1>
+<h1><?php echo $evento['nome_evento']; ?></h1>
  
-<p><strong>CEP:</strong> <?php echo $posto['endereco']; ?></p>
-<p><strong>Preço:</strong> <?php echo $posto['endereco']; ?></p>
+<p><strong>CEP:</strong> <?php echo $evento['endereco']; ?></p>
+<p><strong>Preço:</strong> <?php echo $evento['endereco']; ?></p>
 <p><strong>Horário:</strong> 
-    <?php echo date("H:i", strtotime($posto['hora_abre'])); ?> - 
-    <?php echo date("H:i", strtotime($posto['hora_fecha'])); ?>
+    <?php echo date("H:i", strtotime($evento['hora_abre'])); ?> - 
+    <?php echo date("H:i", strtotime($evento['hora_fecha'])); ?>
 </p>
 <p><strong>Data:</strong> De 
-    <?php echo date("H:i", strtotime($posto['hora_abre'])); ?> até 
-    <?php echo date("H:i", strtotime($posto['hora_abre'])); ?>
+    <?php echo date("H:i", strtotime($evento['hora_abre'])); ?> até 
+    <?php echo date("H:i", strtotime($evento['hora_abre'])); ?>
 </p>
-<p><strong>Observações:</strong> <?php echo $posto['obs']; ?></p>
+<p><strong>Observações:</strong> <?php echo $evento['obs']; ?></p>
 
 <!-- Galeria de Fotos -->
 <h2>Galeria de Fotos</h2>
-<div id="carouselPosto" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselevento" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <?php 
     $active = true;
@@ -135,11 +138,11 @@ $comentarios = $stmt->get_result();
       </div>
     <?php } ?>
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselPosto" data-bs-slide="prev">
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselevento" data-bs-slide="prev">
     <span class="carousel-control-prev-icon"></span>
     <span class="visually-hidden">Anterior</span>
   </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselPosto" data-bs-slide="next">
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselevento" data-bs-slide="next">
     <span class="carousel-control-next-icon"></span>
     <span class="visually-hidden">Próximo</span>
   </button>

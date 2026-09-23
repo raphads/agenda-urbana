@@ -19,6 +19,9 @@
 </style>
 
 </head>
+<header>
+    <?php include 'header.php' ?>
+</header>
 <body>
     <div class="container-fluid">
 <div class="row">
@@ -48,7 +51,7 @@
 
         <div class="col-md-4"></div>
         <div class="col-md-4">
-            <img src="images/posto1.jpg" style="height: 90%; width: 90%;">
+            <img src="images/evento1.jpg" style="height: 90%; width: 90%;">
         </div>
         <div class="col-md-4"></div>
 
