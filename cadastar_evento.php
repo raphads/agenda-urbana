@@ -15,12 +15,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cep          = $_POST["cep"];
     $numero       = $_POST["numero"];
     $obs          = $_POST["obs"];
+    $empresa      = 1;
 
     // 2. Inserção do evento utilizando Prepared Statement
-    $sql = $conecta_db->prepare("INSERT INTO tb_evento (nome_evento, preco_barato, preco_caro, data_abre, data_fecha, endereco, num_evento, latitude, longitude, hora_abre, hora_fecha, obs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $sql = $conecta_db->prepare("INSERT INTO tb_evento (nome_evento, preco_barato, preco_caro, data_abre, data_fecha, endereco, num_evento, latitude, longitude, hora_abre, hora_fecha, obs, id_empresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
     // Tipos: s = string, d = decimal/double
-    $sql->bind_param("sddsssssssss", $eventonome, $preco_barato, $preco_caro, $data_abre, $data_fecha, $cep, $numero, $lati, $long, $tempo1, $tempo2, $obs);
+    $sql->bind_param("sddsssssssssi", $eventonome, $preco_barato, $preco_caro, $data_abre, $data_fecha, $cep, $numero, $lati, $long, $tempo1, $tempo2, $obs,$empresa);
     
     if ($sql->execute()) {
         $evento_id = $conecta_db->insert_id;

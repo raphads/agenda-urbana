@@ -9,7 +9,20 @@ include "conexao.php";
 date_default_timezone_set('America/Sao_Paulo');
 
 $evento_id = $_GET['id'];
-$id_user_logado = $_SESSION['usuario_id'];
+$usuario_sessao = $_SESSION['usuario'];
+
+// Identifica o ID real do usuário logado buscando pelo e-mail ou nome na sessão
+$stmt_busca_user = $conecta_db->prepare("SELECT id_user FROM tb_cadastro WHERE email_user = ? OR name_user = ?");
+$stmt_busca_user->bind_param("ss", $usuario_sessao, $usuario_sessao);
+$stmt_busca_user->execute();
+$res_user = $stmt_busca_user->get_result();
+
+if ($row_user = $res_user->fetch_assoc()) {
+    $id_user_logado = $row_user['id_user'];
+} else {
+    // Fallback caso utilize a session de ID numérica antiga
+    $id_user_logado = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : 0;
+}
 
 // 1. Lógica para Favoritar / Desfavoritar (Alternar)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['acao_favorito'])) {
@@ -32,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['acao_favorito'])) {
     exit;
 }
 
-// 2. CORREÇÃO: Verificar se o evento atual é favorito do usuário logado (Isso estava faltando!)
+// 2. Verificar se o evento atual é favorito do usuário logado
 $is_fav_stmt = $conecta_db->prepare("SELECT id_fav FROM tb_fav WHERE id_user = ? AND id_evento = ?");
 $is_fav_stmt->bind_param("ii", $id_user_logado, $evento_id);
 $is_fav_stmt->execute();
