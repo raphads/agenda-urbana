@@ -6,13 +6,11 @@ if (!isset($_SESSION['usuario'])) {
 }
 
 include "conexao.php";
-
 date_default_timezone_set('America/Sao_Paulo');
-
 
 $id_user_logado = $_SESSION['usuario_id'];
 
-// Lógica para remover dos favoritos caso o usuário clique na lixeira
+// Lógica para remover dos favoritos
 if (isset($_GET['remover'])) {
     $id_fav_remover = $_GET['remover'];
     $stmt_del = $conecta_db->prepare("DELETE FROM tb_fav WHERE id_fav = ? AND id_user = ?");
@@ -23,9 +21,9 @@ if (isset($_GET['remover'])) {
     exit;
 }
 
-// Buscar eventos favoritos do usuário logado
+// Buscar eventos favoritos do usuário logado (incluindo horários e endereço)
 $stmt = $conecta_db->prepare("
-    SELECT f.id_fav, e.id_evento, e.nome_evento, e.data_abre, e.data_fecha, e.endereco, e.preco_barato, e.preco_caro
+    SELECT f.id_fav, e.id_evento, e.nome_evento, e.data_abre, e.data_fecha, e.hora_abre, e.hora_fecha, e.endereco, e.preco_barato, e.preco_caro
     FROM tb_fav f
     JOIN tb_evento e ON f.id_evento = e.id_evento
     WHERE f.id_user = ?
@@ -58,18 +56,32 @@ $favoritos = $stmt->get_result();
 
     <?php if ($favoritos->num_rows > 0) { ?>
         <div class="row">
-            <?php while ($fav = $favoritos->fetch_assoc()) { ?>
+            <?php while ($fav = $favoritos->fetch_assoc()) { 
+                // Formatando dados para o link do Google Agenda (Padrão: AAAAMMDDTHHMMSSZ)
+                $g_titulo = urlencode($fav['nome_evento']);
+                $g_inicio = date("Ymd\THis", strtotime($fav['data_abre'] . ' ' . $fav['hora_abre']));
+                $g_fim = date("Ymd\THis", strtotime($fav['data_fecha'] . ' ' . $fav['hora_fecha']));
+                $g_local = urlencode($fav['endereco']);
+                
+                $url_google_agenda = "https://calendar.google.com/calendar/render?action=TEMPLATE&text={$g_titulo}&dates={$g_inicio}/{$g_fim}&location={$g_local}";
+            ?>
                 <div class="col-md-4 mb-3">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($fav['nome_evento']); ?></h5>
-                            <p class="card-text mb-1"><strong>Data:</strong> <?php echo date("d/m/Y", strtotime($fav['data_abre'])); ?> - <?php echo date("d/m/Y", strtotime($fav['data_fecha'])); ?></p>
+                            <p class="card-text mb-1"><strong>Data:</strong> <?php echo date("d/m/Y", strtotime($fav['data_abre'])); ?> -  <?php echo date("d/m/Y", strtotime($fav['data_fecha'])); ?></p>
+                            <p class="card-text mb-1"><strong>Horário:</strong> <?php echo date("H:i", strtotime($fav['hora_abre'])); ?> - <?php echo date("H:i", strtotime($fav['hora_fecha'])); ?></p>
                             <p class="card-text mb-1"><strong>Preço:</strong> R$<?php echo $fav['preco_barato']; ?> - R$<?php echo $fav['preco_caro']; ?></p>
+                           
                             
                             <div class="d-flex justify-content-between align-items-center">
-                                <!-- Ajuste o nome do arquivo abaixo caso sua página de detalhes tenha outro nome (ex: evento.php) -->
                                 <a href="evento.php?id=<?php echo $fav['id_evento']; ?>" class="btn btn-primary btn-sm" style="background-color: #17395e; border-color: #ee603c;">Ver Detalhes</a>
                                 
+                                <!-- Botão do Google Agenda -->
+                                <a href="<?php echo $url_google_agenda; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Adicionar ao Google Agenda">
+                                    <i class="fa fa-calendar-plus-o"></i> Google Agenda
+                                </a>
+
                                 <a href="favoritos.php?remover=<?php echo $fav['id_fav']; ?>" class="text-danger" title="Remover dos favoritos" onclick="return confirm('Deseja remover este evento dos favoritos?');">
                                     <i class="fa fa-trash" style="font-size: 1.3rem;"></i>
                                 </a>
