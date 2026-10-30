@@ -78,7 +78,7 @@ $favoritos = $stmt->get_result();
                                 <a href="evento.php?id=<?php echo $fav['id_evento']; ?>" class="btn btn-primary btn-sm" style="background-color: #17395e; border-color: #ee603c;">Ver Detalhes</a>
                                 
                                 <!-- Botão do Google Agenda -->
-                                <a href="<?php echo $url_google_agenda; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Adicionar ao Google Agenda">
+                                <a href="<?php echo $url_google_agenda; ?>" target="_blank" class="btn btn-primary btn-sm" title="Adicionar ao Google Agenda">
                                     <i class="fa fa-calendar-plus-o"></i> Google Agenda
                                 </a>
 

@@ -16,25 +16,21 @@ $id_user_logado = $_SESSION['usuario_id'];
 
 // 1. Lógica para Favoritar / Desfavoritar (Alternar)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['acao_favorito'])) {
-    // Verifica se já existe nos favoritos
     $check_fav = $conecta_db->prepare("SELECT id_fav FROM tb_fav WHERE id_user = ? AND id_evento = ?");
     $check_fav->bind_param("ii", $id_user_logado, $evento_id);
     $check_fav->execute();
     $res_fav = $check_fav->get_result();
 
     if ($res_fav->num_rows > 0) {
-        // Se já é favorito, remove
         $del_fav = $conecta_db->prepare("DELETE FROM tb_fav WHERE id_user = ? AND id_evento = ?");
         $del_fav->bind_param("ii", $id_user_logado, $evento_id);
         $del_fav->execute();
     } else {
-        // Se não é favorito, adiciona
         $ins_fav = $conecta_db->prepare("INSERT INTO tb_fav (id_user, id_evento) VALUES (?, ?)");
         $ins_fav->bind_param("ii", $id_user_logado, $evento_id);
         $ins_fav->execute();
     }
 
-    // Redireciona para evitar reenvio do formulário ao atualizar a página
     header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $evento_id);
     exit;
 }
@@ -128,7 +124,9 @@ $comentarios = $stmt->get_result();
     </div>
     <hr>
      
-<p><strong>CEP:</strong> <?php echo $evento['endereco']; ?></p>
+<!-- Exibição do Endereço Automático via CEP -->
+<p><strong>CEP:</strong> <span id="span-cep"><?php echo htmlspecialchars($evento['endereco']); ?></span></p>
+<p><strong>Endereço:</strong> <span id="endereco-completo">Carregando endereço...</span><strong> Nº:</strong><?php echo $evento['num_evento']; ?></p>
 <p><strong>Preço:</strong> De R$<?php echo $evento['preco_barato']; ?> até R$<?php echo $evento['preco_caro']; ?></p>
 
 <p><strong>Horário:</strong> 
@@ -196,6 +194,37 @@ $comentarios = $stmt->get_result();
     <div class="col-md-2"></div>
 </div>
 </div>
+
+<!-- Script para buscar o endereço via CEP automaticamente -->
+<!-- Script para buscar o endereço via CEP automaticamente -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var cepElement = document.getElementById('span-cep');
+    var enderecoElement = document.getElementById('endereco-completo');
+    
+    if (cepElement && enderecoElement) {
+        var cep = cepElement.textContent.replace(/\D/g, ''); // Remove caracteres não numéricos do CEP
+        
+        if (cep.length === 8) {
+            fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                .then(response => response.json())
+                .then(dados => {
+                    if (!dados.erro) {
+                        var enderecoFormatado = dados.logradouro + ", " + dados.bairro + " - " + dados.localidade + "/" + dados.uf;
+                        enderecoElement.textContent = enderecoFormatado;
+                    } else {
+                        enderecoElement.textContent = "CEP não encontrado.";
+                    }
+                })
+                .catch(error => {
+                    enderecoElement.textContent = "Erro ao carregar o endereço.";
+                });
+        } else {
+            enderecoElement.textContent = "CEP inválido.";
+        }
+    }
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
 </body>
 </html>

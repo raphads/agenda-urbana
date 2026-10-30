@@ -62,11 +62,11 @@ if (!isset($_SESSION['usuario'])) {
         <!-- Campos de Preço adicionados com base na página de exibição -->
         <div class="row">
             <div class="col-md-6">
-                <label>Preço Mínimo (De R$)</label><br>
+                <label>Preço Mínimo (R$)</label><br>
                 <input type="number" step="0.01" min="0" class="form-control" placeholder="0.00" name="preco_barato" required><br>
             </div>
             <div class="col-md-6">
-                <label>Preço Máximo (Até R$)</label><br>
+                <label>Preço Máximo (R$)</label><br>
                 <input type="number" step="0.01" min="0" class="form-control" placeholder="0.00" name="preco_caro" required><br>
             </div>
         </div>
