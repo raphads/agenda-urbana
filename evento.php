@@ -78,7 +78,7 @@ $stmt->bind_param("i", $evento_id);
 $stmt->execute();
 $comentarios = $stmt->get_result();
 
-
+ 
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -115,14 +115,15 @@ $comentarios = $stmt->get_result();
 <h1><?php echo $evento['nome_evento']; ?></h1>
  
 <p><strong>CEP:</strong> <?php echo $evento['endereco']; ?></p>
-<p><strong>Preço:</strong> <?php echo $evento['endereco']; ?></p>
+<p><strong>Preço:</strong> De R$<?php echo $evento['preco_barato']; ?> até R$<?php echo $evento['preco_caro']; ?></p>
+
 <p><strong>Horário:</strong> 
     <?php echo date("H:i", strtotime($evento['hora_abre'])); ?> - 
     <?php echo date("H:i", strtotime($evento['hora_fecha'])); ?>
 </p>
 <p><strong>Data:</strong> De 
-    <?php echo date("H:i", strtotime($evento['hora_abre'])); ?> até 
-    <?php echo date("H:i", strtotime($evento['hora_abre'])); ?>
+    <?php echo date("d/m/Y", strtotime($evento['data_abre'])); ?> até 
+    <?php echo date("d/m/Y", strtotime($evento['data_fecha'])); ?>
 </p>
 <p><strong>Observações:</strong> <?php echo $evento['obs']; ?></p>
 
