@@ -4,11 +4,8 @@ if (!isset($_SESSION['usuario'])) {
     header("Location: index.php");
     exit;
 }
-?>
 
-<?php
 include "conexao.php";
-
 date_default_timezone_set('America/Sao_Paulo');
 
 $evento_id = $_GET['id'];
@@ -35,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['acao_favorito'])) {
     exit;
 }
 
-// 2. Verificar se o evento atual é favorito do usuário logado
+// 2. CORREÇÃO: Verificar se o evento atual é favorito do usuário logado (Isso estava faltando!)
 $is_fav_stmt = $conecta_db->prepare("SELECT id_fav FROM tb_fav WHERE id_user = ? AND id_evento = ?");
 $is_fav_stmt->bind_param("ii", $id_user_logado, $evento_id);
 $is_fav_stmt->execute();
@@ -196,14 +193,13 @@ $comentarios = $stmt->get_result();
 </div>
 
 <!-- Script para buscar o endereço via CEP automaticamente -->
-<!-- Script para buscar o endereço via CEP automaticamente -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     var cepElement = document.getElementById('span-cep');
     var enderecoElement = document.getElementById('endereco-completo');
     
     if (cepElement && enderecoElement) {
-        var cep = cepElement.textContent.replace(/\D/g, ''); // Remove caracteres não numéricos do CEP
+        var cep = cepElement.textContent.replace(/\D/g, ''); 
         
         if (cep.length === 8) {
             fetch('https://viacep.com.br/ws/' + cep + '/json/')
