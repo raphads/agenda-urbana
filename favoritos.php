@@ -65,7 +65,6 @@ $favoritos = $stmt->get_result();
                             <h5 class="card-title"><?php echo htmlspecialchars($fav['nome_evento']); ?></h5>
                             <p class="card-text mb-1"><strong>Data:</strong> <?php echo date("d/m/Y", strtotime($fav['data_abre'])); ?> - <?php echo date("d/m/Y", strtotime($fav['data_fecha'])); ?></p>
                             <p class="card-text mb-1"><strong>Preço:</strong> R$<?php echo $fav['preco_barato']; ?> - R$<?php echo $fav['preco_caro']; ?></p>
-                            <p class="card-text mb-3"><strong>CEP:</strong> <?php echo htmlspecialchars($fav['endereco']); ?></p>
                             
                             <div class="d-flex justify-content-between align-items-center">
                                 <!-- Ajuste o nome do arquivo abaixo caso sua página de detalhes tenha outro nome (ex: evento.php) -->
