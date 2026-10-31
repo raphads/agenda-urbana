@@ -89,7 +89,7 @@ while ($linha = mysqli_fetch_assoc($resultado)) {
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h3 mb-0"><i class="fa fa-map-marker text-warning"></i> Mapa dos Eventos</h1>
-            <p class="text-white-50 mb-0">Encontre eventos próximos a você ou filtre por raio de distância</p>
+            <p class="text-white-50 mb-0">Encontre eventos próximos a você!</p>
         </div>
     </div>
 </div>
