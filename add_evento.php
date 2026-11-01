@@ -158,11 +158,11 @@ if (!isset($_SESSION['usuario'])) {
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Latitude</label>
-                            <input type="text" class="form-control" id="lati" name="lati" placeholder="-23.6821" required>
+                            <input type="text" class="form-control" id="lati" name="lati" placeholder="-##.####" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Longitude</label>
-                            <input type="text" class="form-control" id="long" name="long" placeholder="-46.5427" required>
+                            <input type="text" class="form-control" id="long" name="long" placeholder="-##.####" required>
                         </div>
                     </div>
 

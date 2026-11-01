@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit">
-    <title>Pernoite Amiga</title>
+    <title>Agenda Urbana</title>
     <link rel="icon" href="images/logo-agenda-teste.png">
     <link rel="stylesheet" href="style.css">
     <script src="agenda.js"></script>
@@ -22,7 +22,7 @@ $sql->bind_param("ss", $user, $senha); // "ss" = duas strings
 $sql->execute();
 $result = $sql->get_result(); // Executa a consulta e obtém o resultado
 
-if($user == "admin@pernoite.com" && $senha == "@Admin1234"){
+if($user == "admin@agenda.com" && $senha == "@Admin1234"){
     echo "<center>";
     echo "<br>";
     //echo "<a href=\"area_adm.php\">Area do Administrador</a>";
