@@ -1,4 +1,12 @@
 <?php
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header("Location: index.php");
+    exit;
+}
+?>
+
+<?php
 include "conexao.php";
 
 $sql = "SELECT * FROM tb_cadastro";
