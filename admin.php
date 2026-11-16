@@ -53,17 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     if ($_POST['acao'] === 'excluir_evento') {
         $id = $_POST['id_evento'];
         
-        // Remove fotos vinculadas primeiro
         $stmtFoto = $conecta_db->prepare("DELETE FROM fotos_eventos WHERE id_evento = ?");
         $stmtFoto->bind_param("i", $id);
         $stmtFoto->execute();
 
-        // Remove comentários vinculados
         $stmtCom = $conecta_db->prepare("DELETE FROM tb_comentarios WHERE id_evento = ?");
         $stmtCom->bind_param("i", $id);
         $stmtCom->execute();
 
-        // Remove do evento
         $stmt = $conecta_db->prepare("DELETE FROM tb_evento WHERE id_evento = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -76,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $id = $_POST['id_evento'];
         $nome = $_POST['nome_evento'];
         $cep = $_POST['endereco'];
-        $numero = $_POST['num_evento']; // Captura o número
+        $numero = $_POST['num_evento'];
         $preco_b = $_POST['preco_barato'];
         $preco_c = $_POST['preco_caro'];
         $data_a = $_POST['dataa']; 
@@ -84,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $lati = $_POST['latitude'];
         $long = $_POST['longitude'];
 
-        // Atualizado para incluir número, latitude e longitude
         $stmt = $conecta_db->prepare("UPDATE tb_evento SET nome_evento = ?, endereco = ?, num_evento = ?, preco_barato = ?, preco_caro = ?, data_abre = ?, data_fecha = ?, latitude = ?, longitude = ? WHERE id_evento = ?");
         $stmt->bind_param("sssddssssi", $nome, $cep, $numero, $preco_b, $preco_c, $data_a, $data_b, $lati, $long, $id);
         $stmt->execute();
@@ -93,9 +89,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     }
 }
 
-// 2. BUSCA DE DADOS PARA AS TABELAS
+// 2. BUSCA DE DADOS PARA AS TABELAS E GRÁFICOS
 $usuarios = $conecta_db->query("SELECT * FROM tb_cadastro ORDER BY id_user DESC");
 $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC");
+
+// Contagem para o Gráfico de Usuários
+$sql_users_stats = "SELECT empresa, COUNT(*) as total FROM tb_cadastro GROUP BY empresa";
+$res_users_stats = $conecta_db->query($sql_users_stats);
+$comum_count = 0;
+$empresa_count = 0;
+while($row_u = $res_users_stats->fetch_assoc()) {
+    if($row_u['empresa'] == 1) {
+        $empresa_count = $row_u['total'];
+    } else {
+        $comum_count = $row_u['total'];
+    }
+}
+
+// CEPs dos Eventos para o Gráfico de Cidades
+$sql_eventos_stats = "SELECT endereco FROM tb_evento WHERE endereco IS NOT NULL AND endereco != ''";
+$res_eventos_stats = $conecta_db->query($sql_eventos_stats);
+$ceps_eventos = [];
+while($row_ev = $res_eventos_stats->fetch_assoc()) {
+    $cep_limpo = preg_replace('/\D/', '', $row_ev['endereco']);
+    if(strlen($cep_limpo) === 8) {
+        $ceps_eventos[] = $cep_limpo;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -112,6 +132,8 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body {
@@ -178,7 +200,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
     <div class="container d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h3 mb-0"><i class="fa fa-cogs"></i> Painel de Administração</h1>
-            <p class="text-white-50 mb-0">Gerencie os usuários e eventos cadastrados na plataforma</p>
+            <p class="text-white-50 mb-0">Gerencie os usuários, eventos e estatísticas da plataforma</p>
         </div>
         <div>
             <span class="badge bg-light text-dark p-2 px-3 rounded-pill">
@@ -199,6 +221,11 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
                 <i class="fa fa-calendar me-2"></i> Eventos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">
+                <i class="fa fa-pie-chart me-2"></i> Estatísticas
             </button>
         </li>
     </ul>
@@ -302,6 +329,33 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                 </div>
             </div>
 
+            <!-- ABA DE ESTATÍSTICAS / GRÁFICOS -->
+            <div class="tab-pane fade" id="stats" role="tabpanel">
+                <div class="row">
+                    <!-- Gráfico de Pizza / Rosca: Usuários vs Empresas -->
+                    <div class="col-lg-5 mb-4">
+                        <div class="card border-0 shadow-sm p-4 h-100 bg-light">
+                            <h4 class="fw-bold text-dark mb-2"><i class="fa fa-users text-primary me-2"></i> Tipos de Usuários</h4>
+                            <p class="text-muted small">Proporção entre contas comuns e corporativas (empresas).</p>
+                            <div style="position: relative; height: 260px; width: 100%;" class="d-flex justify-content-center align-items-center">
+                                <canvas id="userChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Colunas: Eventos por Cidade (Via CEP) -->
+                    <div class="col-lg-7 mb-4">
+                        <div class="card border-0 shadow-sm p-4 h-100 bg-light">
+                            <h4 class="fw-bold text-dark mb-2"><i class="fa fa-bar-chart text-success me-2"></i> Eventos por Cidade</h4>
+                            <p class="text-muted small">Consulta automática via CEP dos eventos cadastrados.</p>
+                            <div style="position: relative; height: 260px; width: 100%;">
+                                <canvas id="cityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -371,11 +425,11 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Latitude</label>
-                    <input type="text" name="latitude" id="edit-event-lati" class="form-control" placeholder="-23.6821" required>
+                    <input type="text" name="latitude" id="edit-event-lati" class="form-control coords-mask" placeholder="-23.6821" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Longitude</label>
-                    <input type="text" name="longitude" id="edit-event-long" class="form-control" placeholder="-46.5427" required>
+                    <input type="text" name="longitude" id="edit-event-long" class="form-control coords-mask" placeholder="-46.5427" required>
                 </div>
             </div>
 
@@ -407,7 +461,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
   </div>
 </div>
 
-<!-- JScripts (Carregados na ordem correta) -->
+<!-- JScripts -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <!-- jQuery Inputmask CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
@@ -427,8 +481,17 @@ $(document).ready(function() {
     $('#tabelaUsuarios').DataTable(configDataTables);
     $('#tabelaEventos').DataTable(configDataTables);
 
-    // Inicializa a máscara de CEP com Inputmask
+    // Inicialização das Máscaras
     $('.cep-mask').inputmask('99999-999');
+    
+    var coordsConfig = {
+        alias: 'numeric',
+        allowMinus: true,
+        digits: 6,
+        digitsOptional: true,
+        placeholder: ''
+    };
+    $('.coords-mask').inputmask(coordsConfig);
 
     // Abrir Modal de Edição de Usuário
     $('.edit-user-btn').click(function() {
@@ -451,12 +514,94 @@ $(document).ready(function() {
         $('#edit-event-precoc').val($(this).data('precoc'));
         $('#edit-event-dataa').val($(this).data('dataa'));
         $('#edit-event-datab').val($(this).data('datab'));
-        $('#edit-event-lati').val($(this).data('lati')).trigger('input');
-        $('#edit-event-long').val($(this).data('long')).trigger('input');
+        $('#edit-event-lati').inputmask('setvalue', $(this).data('lati'));
+        $('#edit-event-long').inputmask('setvalue', $(this).data('long'));
         
         var modalEvent = new bootstrap.Modal(document.getElementById('modalEditEvent'));
         modalEvent.show();
     });
+
+    // --- GRÁFICO 1: USUÁRIOS ---
+    var ctxUser = document.getElementById('userChart').getContext('2d');
+    new Chart(ctxUser, {
+        type: 'doughnut',
+        data: {
+            labels: ['Usuários Comuns', 'Empresas'],
+            datasets: [{
+                data: [<?php echo $comum_count; ?>, <?php echo $empresa_count; ?>],
+                backgroundColor: ['#17395e', '#ee603c'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // --- GRÁFICO 2: CIDADES DOS EVENTOS VIA VIACEP ---
+    const cepsList = <?php echo json_encode($ceps_eventos); ?>;
+
+    async function gerarGraficoCidadesAdmin() {
+        let contagemCidades = {};
+
+        for (let cep of cepsList) {
+            try {
+                let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                let data = await response.json();
+                if (!data.erro) {
+                    let cidadeEstado = data.localidade + " / " + data.uf;
+                    contagemCidades[cidadeEstado] = (contagemCidades[cidadeEstado] || 0) + 1;
+                }
+            } catch (error) {
+                console.error("Erro ao consultar CEP:", cep);
+            }
+        }
+
+        let labelsCidades = Object.keys(contagemCidades);
+        let valoresCidades = Object.values(contagemCidades);
+
+        var ctxCity = document.getElementById('cityChart').getContext('2d');
+        new Chart(ctxCity, {
+            type: 'bar',
+            data: {
+                labels: labelsCidades.length > 0 ? labelsCidades : ['Nenhum evento com CEP'],
+                datasets: [{
+                    label: 'Eventos',
+                    data: valoresCidades.length > 0 ? valoresCidades : [0],
+                    backgroundColor: '#17395e',
+                    borderColor: '#102a48',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    gerarGraficoCidadesAdmin();
 });
 </script>
 </body>
