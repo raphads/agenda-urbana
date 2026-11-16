@@ -36,7 +36,9 @@ $(document).ready(function(){
     $('#cep').inputmask('99999-999'); // Máscara para CEP
     $('#lati').inputmask('-99.9999');
      $('#long').inputmask('-99.9999');
-
+     $('#edit-event-lati').inputmask('-99.9999');
+     $('#edit-event-long').inputmask('-99.9999');
+$('#edit-event-cep').inputmask('99999-999');
 
 
 $('#cep').on('blur', function() {

@@ -80,9 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $preco_c = $_POST['preco_caro'];
         $data_a = $_POST['dataa']; 
         $data_b = $_POST['datab']; 
+        $lati = $_POST['latitude'];
+        $long = $_POST['longitude'];
 
-        $stmt = $conecta_db->prepare("UPDATE tb_evento SET nome_evento = ?, endereco = ?, preco_barato = ?, preco_caro = ?, data_abre = ?, data_fecha = ? WHERE id_evento = ?");
-        $stmt->bind_param("ssddssi", $nome, $cep, $preco_b, $preco_c, $data_a, $data_b, $id);
+        // Atualizado para incluir latitude e longitude
+        $stmt = $conecta_db->prepare("UPDATE tb_evento SET nome_evento = ?, endereco = ?, preco_barato = ?, preco_caro = ?, data_abre = ?, data_fecha = ?, latitude = ?, longitude = ? WHERE id_evento = ?");
+        $stmt->bind_param("ssddssssi", $nome, $cep, $preco_b, $preco_c, $data_a, $data_b, $lati, $long, $id);
         $stmt->execute();
         header("Location: admin.php");
         exit;
@@ -100,7 +103,9 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Agenda Urbana</title>
     <link rel="icon" href="images/logo-agenda-teste.png">
-    
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
+  <script src="agenda.js"></script>
     <link rel="stylesheet" href="style.css">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -278,6 +283,8 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                                                 data-precoc="<?php echo $e['preco_caro']; ?>"
                                                 data-dataa="<?php echo $e['data_abre']; ?>"
                                                 data-datab="<?php echo $e['data_fecha']; ?>"
+                                                data-lati="<?php echo $e['latitude']; ?>"
+                                                data-long="<?php echo $e['longitude']; ?>"
                                                 title="Editar Evento">
                                             <i class="fa fa-pencil"></i>
                                         </button>
@@ -353,6 +360,19 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                 <label class="form-label fw-bold">CEP</label>
                 <input type="text" name="endereco" id="edit-event-cep" class="form-control" required>
             </div>
+            
+            <!-- Novos Campos de Latitude e Longitude adicionados -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Latitude</label>
+                    <input type="text" name="edit-event-lati" id="edit-event-lati" class="form-control" placeholder="-23.6821" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Longitude</label>
+                    <input type="text" name="edit-event-long" id="edit-event-long" class="form-control" placeholder="-46.5427" required>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Preço Mínimo (R$)</label>
@@ -419,6 +439,8 @@ $(document).ready(function() {
         $('#edit-event-precoc').val($(this).data('precoc'));
         $('#edit-event-dataa').val($(this).data('dataa'));
         $('#edit-event-datab').val($(this).data('datab'));
+        $('#edit-event-lati').val($(this).data('lati'));
+        $('#edit-event-long').val($(this).data('long'));
         
         var modalEvent = new bootstrap.Modal(document.getElementById('modalEditEvent'));
         modalEvent.show();
