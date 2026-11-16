@@ -76,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $id = $_POST['id_evento'];
         $nome = $_POST['nome_evento'];
         $cep = $_POST['endereco'];
+        $numero = $_POST['num_evento']; // Captura o número
         $preco_b = $_POST['preco_barato'];
         $preco_c = $_POST['preco_caro'];
         $data_a = $_POST['dataa']; 
@@ -83,9 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         $lati = $_POST['latitude'];
         $long = $_POST['longitude'];
 
-        // Atualizado para incluir latitude e longitude
-        $stmt = $conecta_db->prepare("UPDATE tb_evento SET nome_evento = ?, endereco = ?, preco_barato = ?, preco_caro = ?, data_abre = ?, data_fecha = ?, latitude = ?, longitude = ? WHERE id_evento = ?");
-        $stmt->bind_param("ssddssssi", $nome, $cep, $preco_b, $preco_c, $data_a, $data_b, $lati, $long, $id);
+        // Atualizado para incluir número, latitude e longitude
+        $stmt = $conecta_db->prepare("UPDATE tb_evento SET nome_evento = ?, endereco = ?, num_evento = ?, preco_barato = ?, preco_caro = ?, data_abre = ?, data_fecha = ?, latitude = ?, longitude = ? WHERE id_evento = ?");
+        $stmt->bind_param("sssddssssi", $nome, $cep, $numero, $preco_b, $preco_c, $data_a, $data_b, $lati, $long, $id);
         $stmt->execute();
         header("Location: admin.php");
         exit;
@@ -103,9 +104,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Agenda Urbana</title>
     <link rel="icon" href="images/logo-agenda-teste.png">
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
-  <script src="agenda.js"></script>
+    
     <link rel="stylesheet" href="style.css">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -260,7 +259,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
-                                <th>CEP</th>
+                                <th>CEP / Nº</th>
                                 <th>Preços</th>
                                 <th>Datas</th>
                                 <th class="text-center">Ações</th>
@@ -271,7 +270,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                                 <tr>
                                     <td><strong>#<?php echo $e['id_evento']; ?></strong></td>
                                     <td><?php echo htmlspecialchars($e['nome_evento']); ?></td>
-                                    <td><?php echo htmlspecialchars($e['endereco']); ?></td>
+                                    <td><?php echo htmlspecialchars($e['endereco']); ?> (Nº <?php echo htmlspecialchars($e['num_evento']); ?>)</td>
                                     <td>R$<?php echo number_format($e['preco_barato'], 2, ',', '.'); ?> - R$<?php echo number_format($e['preco_caro'], 2, ',', '.'); ?></td>
                                     <td><?php echo date("d/m/Y", strtotime($e['data_abre'])); ?> até <?php echo date("d/m/Y", strtotime($e['data_fecha'])); ?></td>
                                     <td class="text-center">
@@ -279,6 +278,7 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                                                 data-id="<?php echo $e['id_evento']; ?>" 
                                                 data-nome="<?php echo htmlspecialchars($e['nome_evento']); ?>" 
                                                 data-cep="<?php echo htmlspecialchars($e['endereco']); ?>"
+                                                data-numero="<?php echo htmlspecialchars($e['num_evento']); ?>"
                                                 data-precob="<?php echo $e['preco_barato']; ?>"
                                                 data-precoc="<?php echo $e['preco_caro']; ?>"
                                                 data-dataa="<?php echo $e['data_abre']; ?>"
@@ -356,20 +356,26 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
                 <label class="form-label fw-bold">Nome do Evento</label>
                 <input type="text" name="nome_evento" id="edit-event-nome" class="form-control" required>
             </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold">CEP</label>
-                <input type="text" name="endereco" id="edit-event-cep" class="form-control" required>
+            
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label fw-bold">CEP</label>
+                    <input type="text" name="endereco" id="edit-event-cep" class="form-control cep-mask" placeholder="00000-000" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Número</label>
+                    <input type="text" name="num_evento" id="edit-event-numero" class="form-control" placeholder="Ex: 120" required>
+                </div>
             </div>
             
-            <!-- Novos Campos de Latitude e Longitude adicionados -->
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Latitude</label>
-                    <input type="text" name="edit-event-lati" id="edit-event-lati" class="form-control" placeholder="-23.6821" required>
+                    <input type="text" name="latitude" id="edit-event-lati" class="form-control" placeholder="-23.6821" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Longitude</label>
-                    <input type="text" name="edit-event-long" id="edit-event-long" class="form-control" placeholder="-46.5427" required>
+                    <input type="text" name="longitude" id="edit-event-long" class="form-control" placeholder="-46.5427" required>
                 </div>
             </div>
 
@@ -401,8 +407,10 @@ $eventos = $conecta_db->query("SELECT * FROM tb_evento ORDER BY id_evento DESC")
   </div>
 </div>
 
-<!-- JScripts -->
+<!-- JScripts (Carregados na ordem correta) -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- jQuery Inputmask CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -419,6 +427,9 @@ $(document).ready(function() {
     $('#tabelaUsuarios').DataTable(configDataTables);
     $('#tabelaEventos').DataTable(configDataTables);
 
+    // Inicializa a máscara de CEP com Inputmask
+    $('.cep-mask').inputmask('99999-999');
+
     // Abrir Modal de Edição de Usuário
     $('.edit-user-btn').click(function() {
         $('#edit-user-id').val($(this).data('id'));
@@ -434,13 +445,14 @@ $(document).ready(function() {
     $('.edit-event-btn').click(function() {
         $('#edit-event-id').val($(this).data('id'));
         $('#edit-event-nome').val($(this).data('nome'));
-        $('#edit-event-cep').val($(this).data('cep'));
+        $('#edit-event-cep').val($(this).data('cep')).trigger('input');
+        $('#edit-event-numero').val($(this).data('numero'));
         $('#edit-event-precob').val($(this).data('precob'));
         $('#edit-event-precoc').val($(this).data('precoc'));
         $('#edit-event-dataa').val($(this).data('dataa'));
         $('#edit-event-datab').val($(this).data('datab'));
-        $('#edit-event-lati').val($(this).data('lati'));
-        $('#edit-event-long').val($(this).data('long'));
+        $('#edit-event-lati').val($(this).data('lati')).trigger('input');
+        $('#edit-event-long').val($(this).data('long')).trigger('input');
         
         var modalEvent = new bootstrap.Modal(document.getElementById('modalEditEvent'));
         modalEvent.show();
