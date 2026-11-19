@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Coração HTML + CSS</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f6f9;
+        }
+
+        .coracao {
+            background-color: #ee603c;
+            display: inline-block;
+            height: 60px;
+            position: relative;
+            transform: rotate(-45deg);
+            width: 60px;
+            animation: bater 1.2s infinite;
+        }
+
+        .coracao:before,
+        .coracao:after {
+            content: "";
+            background-color: #ee603c;
+            border-radius: 50%;
+            height: 60px;
+            position: absolute;
+            width: 60px;
+        }
+
+        .coracao:before {
+            top: -30px;
+            left: 0;
+        }
+
+        .coracao:after {
+            left: 30px;
+            top: 0;
+        }
+
+        @keyframes bater {
+            0%, 100% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="coracao"></div>
+
+</body>
+</html>
